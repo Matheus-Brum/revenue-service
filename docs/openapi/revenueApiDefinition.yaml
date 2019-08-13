@@ -1,0 +1,170 @@
+openapi: 3.0.0
+info:
+  title: Revenue Service
+  description: revenue service to manage revenues.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Main Revenue Dev (development) server
+
+paths:
+  /v1/revenues:
+    $ref: '#/revenues'
+
+  /v1/revenues/{revenueId}:
+    $ref: '#/revenue'
+    
+  /v1/health:
+    get:
+      summary: Check service health.
+      description: Check service health.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  health:
+                    type: string
+                    enum:
+                      - service is up
+
+components:
+  schemas:
+    RevenueModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        category:
+          type: string
+          enum:
+          - job
+          - other
+        amount:
+          type: number
+
+revenues:
+  get:
+    summary: Find revenues.
+    description: retrieves all revenues.
+    responses:
+      200:
+        description: revenues found.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/RevenueModel'
+      404:
+        description: no revenues found.
+      500:
+        description: unexpected error ocurred.
+  post:
+    summary: Create revenue.
+    description: adds a revenue.
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RevenueModel'
+    responses:
+      201:
+        description: created revenue.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevenueModel'
+      400:
+        description: invalid request.
+      500:
+        description: unexpected error ocurred.
+
+revenue:
+  get:
+    summary: Find a revenue.
+    description: retrieves a revenue.
+    parameters:
+      - name: revenueId
+        in: path
+        description: revenue id.
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      200:
+        description: revenue found.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevenueModel'
+      400:
+        description: invalid revenue id.
+      404:
+        description: no revenue found.
+      500:
+        description: unexpected error ocurred.
+  put:
+    summary: Update a revenue.
+    description: updates a revenue.
+    parameters:
+      - name: revenueId
+        in: path
+        description: revenue id.
+        required: true
+        schema:
+          type: string
+          format: uuid
+    requestBody:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RevenueModel'
+    responses:
+      200:
+        description: updated a revenue.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevenueModel'
+      400:
+        description: invalid revenue id or invalid revenue model.
+      404:
+        description: no revenue found.
+      500:
+        description: unexpected error ocurred.
+  delete:
+    summary: Remove a revenue.
+    description: deletes a revenue.
+    parameters:
+      - name: revenueId
+        in: path
+        description: revenue id.
+        required: true
+        schema:
+          type: string
+          format: uuid
+    responses:
+      200:
+        description: deleted a revenue.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RevenueModel'
+      400:
+        description: invalid expense id.
+      404:
+        description: no revenue found.
+      500:
+        description: unexpected error ocurred.
